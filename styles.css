@@ -1,0 +1,98 @@
+        body {
+            background-color: #09203f;
+        }
+        
+         ::-webkit-scrollbar {
+            display: none;
+        }
+        
+        button {
+            margin: 3%;
+            padding: 1% 5%;
+        }
+        
+        .board {
+            width: 80%;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            -ms-transform: translate(-50%, -50%);
+            /* IE 9 */
+            -webkit-transform: translate(-50%, -50%);
+            /* Safari */
+            transform: translate(-50%, -50%);
+            /* Standard syntax */
+            text-align: center;
+        }
+        
+        .beaker {
+            border-bottom: 30vh solid #275cce;
+            border-left: 10vh solid transparent;
+            border-right: 10vh solid transparent;
+            border-radius: 25vh 25vh 2vh 2vh;
+            height: 0;
+            width: 15vh;
+            display: inline-block;
+            line-height: 25vh;
+            font-size: 15vh;
+            text-align: center;
+            color: #6c91e0;
+            font-family: Arial;
+            margin: 1%;
+            font-family: Arial;
+            margin: 1%;
+            font-family: Arial;
+            margin: 1%;
+            filter: drop-shadow(0 1mm 30mm #537895);
+        }
+        
+        button {
+            border: none;
+            color: white;
+            background-color: #275cce;
+            padding: 15px 32px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 5em;
+            cursor: pointer;
+            border-radius: 35px;
+            transition: 0.4s;
+        }
+        
+        .board>button:hover {
+            background-color: #275cce60;
+            transition: 0.4s;
+        }
+        
+        .board>button:active {
+            background-color: tomato;
+        }
+        
+        #mobil-vertical {
+            display: none;
+            font-size: 10vw;
+            text-align: center;
+            color: #724a16;
+            font-family: Arial;
+            padding: 1%;
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+        
+        @media only screen and (orientation:portrait) {
+            .board {
+                display: none;
+            }
+            #mobil-vertical {
+                display: block;
+            }
+        }
+        
+        @media only screen and (orientation:landscape) {
+            #mobil-vertical {
+                display: none;
+            }
+        }

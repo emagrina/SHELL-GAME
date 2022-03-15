@@ -1,15 +1,52 @@
+// Optimizadores de codigo Swal (optimizaremos validadores y botones al no repetirlos en cada alerta)
+const textSwal = Swal.mixin({
+    input: 'text',
+    inputValidator: (value) => {
+        if (!value) {
+            return 'Este campo no puede estar vacio!'
+        } else if (!(isNaN(value))) {
+            return 'Este campo tiene que ser un texto!'
+        }
+    },
+    confirmButtonText: 'Siguiente',
+    confirmButtonColor: '#275cce',
+    allowOutsideClick: false
+});
+const numSwal = Swal.mixin({
+    input: 'number',
+    inputValidator: (value) => {
+        if (!value) {
+            return 'Este campo no puede estar vacio!'
+        } else if (isNaN(Number(value))) {
+            return 'Este campo tiene que ser un numero!'
+        }
+    },
+    confirmButtonText: 'Siguiente',
+    confirmButtonColor: '#275cce',
+    allowOutsideClick: false
+});
+const summary = Swal.mixin({
+    toast: true,
+    position: 'top-end',
+    showConfirmButton: false,
+    timer: 3000,
+    timerProgressBar: true,
+});
 /*  - Empezaremos con unas alertas automaticas que nos pediran lo siguiente:
     -   Nombre
     -   Dificultad
+    -   Dinero total que ingresaremos
     - Mas adelante crearemos una funcion que se iniciara al pulsar el botton
     - donde nos pedira lo siguiente:
     -   Canidad para ingresar
     -   Numero para adividar
     -   Resultado
 */
-let namePlayer;
-let dificultad;
-let maxCubiletes;
+
+let playerName; // Nombre del jugador
+let levelDifficult; // Nivel de dificultad
+let maxCup; // Guardaremos la cantidad lo que vale ese nivel
+let maxBalance; // Maximo de saldo ingresado
 
 (async() => {
     // Alerta de informacion al juego
@@ -22,29 +59,18 @@ let maxCubiletes;
     });
 
     // Insertar el nombre
-    namePlayer = await Swal.fire({
+    playerName = await textSwal.fire({
         title: 'Configuración',
         text: 'Introduzca su nombre:',
-        input: 'text',
-        inputPlaceholder: 'Nombre',
-        inputValidator: (value) => {
-            if (!value) {
-                return 'Este campo no puede estar vacio!'
-            } else if (!(isNaN(value))) {
-                return 'Este campo tiene que ser un texto!'
-            }
-        },
-        confirmButtonText: 'Siguiente',
-        confirmButtonColor: '#275cce',
-        allowOutsideClick: false
+        inputPlaceholder: 'Nombre'
     });
 
-    // Especificar una dificultad
-    dificultad = await Swal.fire({
+    // Especificar una levelDifficult
+    levelDifficult = await Swal.fire({
         title: 'Configuración',
-        text: 'Selecione el nivel de dificultad:',
+        text: 'Selecione el nivel de levelDifficult:',
         input: 'select',
-        inputPlaceholder: 'Dificultad',
+        inputPlaceholder: 'Selecciona la dificultad',
         inputOptions: {
             0: 'Facil (Las apuestas x2)',
             1: 'Medio (Las apuestas x5)',
@@ -60,103 +86,143 @@ let maxCubiletes;
         allowOutsideClick: false
     });
 
-    // Mostramos el nombre del usuario
-    const resumen = Swal.mixin({
-        toast: true,
-        position: 'top-end',
-        showConfirmButton: false,
-        timer: 3000,
-        timerProgressBar: true,
-    })
-
-    resumen.fire({
-        icon: 'info',
-        title: 'Bienvenido ' + namePlayer.value
+    // Insertar el nombre
+    maxBalance = await numSwal.fire({
+        title: 'Configuración',
+        text: 'Introduzca el total de dinero que quiere apostar:',
+        inputPlaceholder: '1500',
+        inputAttributes: {
+            min: 1
+        }
     });
 
-    // Ahora imprimiremos los cubiletes segun la dificultad selecionada
-    switch (dificultad.value) {
+    // Mostramos el nombre del usuario
+    summary.fire({
+        icon: 'info',
+        title: 'Bienvenido ' + playerName.value
+    });
+
+    // Imprimiremos los cubiletes segun la levelDifficult selecionada
+    switch (levelDifficult.value) {
         case '0': // Facil
-            maxCubiletes = 3;
+            maxCup = Number(3);
             break;
         case '1': // Medio
-            maxCubiletes = 5;
+            maxCup = Number(5);
             break;
         case '2': // Dificil
-            maxCubiletes = 7;
+            maxCup = Number(7);
             break;
     }
 
-    for (let x = 1; x <= maxCubiletes; x++) {
+    // Bucle para imprimir los cubiletes en pantalla
+    for (let x = 1; x <= maxCup; x++) {
         document.getElementById('board').innerHTML += `<div class="beaker" id="${x}">${x}</div>`;
     }
+    // Creamos la variable de un valor aleatorio
+    cupWinner = Math.floor((Math.random() * ((maxCup) - 1)) + 1);
 })();
 
-let dineroInsertado;
-let cubileteElegido;
-let cubileteGanador = Math.floor(Math.random() * (maxCubiletes - 1)) + 1;
-
+let wageredBalance; // Saldo apostado
+let cupChosen; // Encontrar donde esta la pelotita 
 // Creamos la funcion que se executara al tocar el boton
 async function reboot() {
-    // Insertar el nombre
-    const Queue = Swal.mixin({
-        progressSteps: ['1', '2', '3'],
-        confirmButtonText: 'Siguiente',
-        confirmButtonColor: '#275cce',
-        allowOutsideClick: false,
-
-    })
-
-    // Guardamos el dinero Insertado
-    dineroInsertado = await Queue.fire({
-        currentProgressStep: 0,
-        title: 'Empezar a apostar',
-        text: 'Inserte la cantidad que quieres apostar:',
-        input: 'number',
-        inputPlaceholder: '50',
-        inputAttributes: {
-            min: 1,
-        },
-        inputValidator: (value) => {
-            if (!value) {
-                return 'Este campo no puede estar vacio!'
-            } else if (isNaN(Number(value))) {
-                return 'Este campo tiene que ser un numero!'
+    if (maxBalance.value > 0) {
+        // Creamos la variable de un valor aleatorio
+        cupWinner = Math.floor((Math.random() * ((maxCup) - 1)) + 1);
+        // Imprimimos el saldo actual arriba a la derecha de la pantalla
+        document.getElementById('currentBalance').innerHTML = `<div class="currentBalanceContent">Tu saldo: ${maxBalance.value} €</div>`;
+        // Guardamos el dinero Insertado
+        wageredBalance = await numSwal.fire({
+            currentProgressStep: 0,
+            progressSteps: ['1', '2', '3'],
+            title: 'Empezar a apostar',
+            text: 'Inserte la cantidad que quieres apostar:',
+            inputPlaceholder: '50',
+            inputAttributes: {
+                min: 1,
             }
-        }
-    });
+        });
 
-    // Guardamos el cubilete que emos elegido
-    cubileteElegido = await Queue.fire({
-        currentProgressStep: 1,
-        title: 'Empezar a apostar',
-        text: 'En que cubilete crees que está la bola:',
-        input: 'number',
-        inputAttributes: {
-            min: 1,
-            max: 3,
-            step: 1
-        },
-        inputValidator: (value) => {
-            if (!value) {
-                return 'Este campo no puede estar vacio!'
-            } else if (isNaN(Number(value))) {
-                return 'Este campo tiene que ser un numero!'
-            } // else if (value > 0 || value < 3)
-        }
-    });
+        // Guardamos el cubilete que emos elegido
+        cupChosen = await numSwal.fire({
+            currentProgressStep: 1,
+            progressSteps: ['1', '2', '3'],
+            title: 'Empezar a apostar',
+            text: 'En que cubilete crees que está la bola:',
+            inputAttributes: {
+                min: 1,
+                max: maxCup,
+                step: 1
+            },
+            inputValidator: (value) => {
+                if (!value) {
+                    return 'Este campo no puede estar vacio!'
+                } else if (isNaN(Number(value))) {
+                    return 'Este campo tiene que ser un numero!'
+                } else if (!(value >= 1 && value <= maxCup)) {
+                    return 'El valor debe ser entre el 1 y el ' + maxCup
+                }
+            }
+        });
 
-    // Mostramos un brebe resumen de nuestros datos
-    await Queue.fire({
-        currentProgressStep: 2,
-        icon: 'info',
-        title: 'Confirme la apuesta',
-        html: '<p><b>Nombre: </b>' + namePlayer.value + '</p>' +
-            '<p><b>Dinero: </b>' + dineroInsertado.value + ' €</p>' +
-            '<p><b>Cubilete elegido: </b>' + cubileteElegido.value + '</p>',
-        showCancelButton: true,
-        cancelButtonText: `Cancelar`,
-        confirmButtonText: 'Confirmar'
-
-    });
+        // Mostramos un brebe summary de nuestros datos
+        await Swal.fire({
+            currentProgressStep: 2,
+            progressSteps: ['1', '2', '3'],
+            icon: 'info',
+            title: 'Confirme la apuesta',
+            html: '<p><strong>Nombre: </strong>' + playerName.value + '</p>' +
+                '<p><strong>Cubilete elegido: </strong>' + cupChosen.value + '</p>' +
+                '<p><strong>Dinero: </strong>' + wageredBalance.value + ' €</p>',
+            showDenyButton: true,
+            denyButtonText: `Cancelar`,
+            confirmButtonText: 'Confirmar',
+            confirmButtonColor: '#275cce'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                let reward;
+                let titleSwalReward;
+                if (cupChosen.value == cupWinner) {
+                    switch (levelDifficult.value) {
+                        case '0': // Facil
+                            reward = wageredBalance.value * 2;
+                            break;
+                        case '1': // Medio
+                            reward = wageredBalance.value * 5;
+                            break;
+                        case '2': // Dificil
+                            reward = wageredBalance.value * 10;
+                            break;
+                    }
+                    maxBalance.value += reward
+                    titleSwalReward = '¡Felicidades! Has ganado'
+                    alertReward = '<h1 style="color:green">' + reward + ' €</h1>'
+                } else {
+                    reward = wageredBalance.value;
+                    maxBalance.value -= reward;
+                    titleSwalReward = '¡Has perdido!'
+                    alertReward = '<h1 style="color:red"> -' + reward + ' €</h1>'
+                }
+                Swal.fire({
+                    position: 'center',
+                    title: titleSwalReward,
+                    html: alertReward,
+                    showConfirmButton: true,
+                    timer: 10000
+                });
+                document.getElementById('currentBalance').innerHTML = `<div class="currentBalanceContent">Tu saldo: ${maxBalance.value} €</div>`;
+            } else if (result.isDenied) {
+                Swal.fire('Changes are not saved', '', 'info')
+            }
+        });
+    } else {
+        Swal.fire({
+            position: 'center',
+            icon: 'error',
+            title: 'No te queda más saldo, regrese otro día.',
+            showConfirmButton: true,
+            timer: 10000
+        });
+    }
 }

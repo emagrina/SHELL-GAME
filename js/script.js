@@ -1,3 +1,4 @@
+"use strict";
 // Optimizadores de codigo Swal (optimizaremos validadores y botones al no repetirlos en cada alerta)
 const textSwal = Swal.mixin({
     input: 'text',
@@ -36,11 +37,6 @@ const summary = Swal.mixin({
     -   Nombre
     -   Dificultad
     -   Dinero total que ingresaremos
-    - Mas adelante crearemos una funcion que se iniciara al pulsar el botton
-    - donde nos pedira lo siguiente:
-    -   Canidad para ingresar
-    -   Numero para adividar
-    -   Resultado
 */
 
 let playerName; // Nombre del jugador
@@ -65,7 +61,7 @@ let maxBalance; // Maximo de saldo ingresado
         inputPlaceholder: 'Nombre'
     });
 
-    // Especificar una levelDifficult
+    // Especificar una dificultad
     levelDifficult = await Swal.fire({
         title: 'Configuración',
         text: 'Selecione el nivel de levelDifficult:',
@@ -119,14 +115,17 @@ let maxBalance; // Maximo de saldo ingresado
     for (let x = 1; x <= maxCup; x++) {
         document.getElementById('board').innerHTML += `<div class="beaker" id="${x}">${x}</div>`;
     }
-    // Creamos la variable de un valor aleatorio
-    cupWinner = Math.floor((Math.random() * ((maxCup) - 1)) + 1);
+
 })();
 
 let wageredBalance; // Saldo apostado
-let cupChosen; // Encontrar donde esta la pelotita 
+let cupChosen; // Encontrar donde esta la pelotita
+let cupWinner; // Guardaremos el numero alazar
+
 // Creamos la funcion que se executara al tocar el boton
 async function reboot() {
+    // Creamos la variable de un valor aleatorio
+    cupWinner = Math.floor((Math.random() * ((maxCup) - 1)) + 1);
     if (maxBalance.value > 0) {
         // Creamos la variable de un valor aleatorio
         cupWinner = Math.floor((Math.random() * ((maxCup) - 1)) + 1);
@@ -141,6 +140,14 @@ async function reboot() {
             inputPlaceholder: '50',
             inputAttributes: {
                 min: 1,
+                max: maxBalance.value
+            },
+            inputValidator: (value) => {
+                if (value > parseInt(maxBalance.value)) {
+                    return 'No tienes suficiente sueldo para apostar, inténtalo con una cantidad menor.'
+                } else if (value < 1) {
+                    return 'Para hacer la apuesta debes apostar números positivos.'
+                }
             }
         });
 
@@ -182,25 +189,26 @@ async function reboot() {
         }).then((result) => {
             if (result.isConfirmed) {
                 let reward;
-                let titleSwalReward;
+                let titleSwalReward; // Guardamos el titulo segun si has ganado o perdido
+                let alertReward; // Guaramos el mensjae de vuelta
                 if (cupChosen.value == cupWinner) {
                     switch (levelDifficult.value) {
                         case '0': // Facil
-                            reward = wageredBalance.value * 2;
+                            reward = parseInt(wageredBalance.value) * 2;
                             break;
                         case '1': // Medio
-                            reward = wageredBalance.value * 5;
+                            reward = parseInt(wageredBalance.value) * 5;
                             break;
                         case '2': // Dificil
-                            reward = wageredBalance.value * 10;
+                            reward = parseInt(wageredBalance.value) * 10;
                             break;
                     }
-                    maxBalance.value += reward
+                    maxBalance.value = parseInt(maxBalance.value) + reward
                     titleSwalReward = '¡Felicidades! Has ganado'
                     alertReward = '<h1 style="color:green">' + reward + ' €</h1>'
                 } else {
-                    reward = wageredBalance.value;
-                    maxBalance.value -= reward;
+                    reward = parseInt(wageredBalance.value);
+                    maxBalance.value = parseInt(maxBalance.value) - reward;
                     titleSwalReward = '¡Has perdido!'
                     alertReward = '<h1 style="color:red"> -' + reward + ' €</h1>'
                 }
@@ -209,20 +217,54 @@ async function reboot() {
                     title: titleSwalReward,
                     html: alertReward,
                     showConfirmButton: true,
+                    showCloseButton: true,
+                    confirmButtonText: '¡Volver a jugar!',
+                    confirmButtonColor: '#275cce',
                     timer: 10000
+                }).then((result) => {
+                    // Repatimos la apuesta
+                    if (result.isConfirmed) {
+                        reboot();
+                    }
                 });
                 document.getElementById('currentBalance').innerHTML = `<div class="currentBalanceContent">Tu saldo: ${maxBalance.value} €</div>`;
             } else if (result.isDenied) {
-                Swal.fire('Changes are not saved', '', 'info')
+                summary.fire({
+                    icon: 'success',
+                    title: 'Su apuesta ha sido cancelada con éxito.',
+                    showConfirmButton: false,
+                    timer: 5000
+                })
             }
         });
     } else {
         Swal.fire({
             position: 'center',
             icon: 'error',
-            title: 'No te queda más saldo, regrese otro día.',
+            title: 'No te queda más saldo, regrese otro día o añade más saldo',
+            showCloseButton: true,
             showConfirmButton: true,
+            showCancelButton: true,
+            confirmButtonText: 'Añadir más saldo',
+            cancelButtonText: 'No, gracias',
+            confirmButtonColor: '#275cce',
             timer: 10000
+        }).then((result) => {
+            // Repatimos la apuesta
+            if (result.isConfirmed) {
+                (async() => {
+                    // Insertar el nombre
+                    maxBalance = await numSwal.fire({
+                        title: 'Configuración',
+                        text: 'Introduzca el total de dinero que quiere apostar:',
+                        inputPlaceholder: '1500',
+                        inputAttributes: {
+                            min: 1
+                        }
+                    });
+                    reboot();
+                })();
+            }
         });
     }
 }

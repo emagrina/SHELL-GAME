@@ -12,7 +12,7 @@
 - [Guide](#guide)
 
 # Overview
-  I have created a small guessing game in which bucket hides the ball, the game is focused on a casino that you insert money to bet, if you are lucky you can go earning money or, on the contrary, lose everything.
+  A small guessing game in which the cube hides the ball, the game focuses on a casino in which you insert money to bet, if you are lucky you can go winning money or, on the contrary, lose everything.
  
  # Guide
  1. It gives us a brief summary of the game.

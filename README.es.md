@@ -12,7 +12,7 @@
 - [Guía](#guía)
 
 # Resumen
-  He creado un pequeño juego de adivinar en que cubilete se esconde la pelotita, el juego está enfocado a un casino que insertas
+  Un pequeño juego de adivinar en que cubilete se esconde la pelotita, el juego está enfocado a un casino que insertas
   dinero para apostar, si tienes suerte puedes ir ganando dinero o, por el contrario, perderlo todo.
  
  # Guía

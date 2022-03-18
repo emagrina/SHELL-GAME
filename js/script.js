@@ -44,14 +44,15 @@ let levelDifficult; // Nivel de dificultad
 let maxCup; // Guardaremos la cantidad lo que vale ese nivel
 let maxBalance; // Maximo de saldo ingresado
 
-(async() => {
+(async () => {
     // Alerta de informacion al juego
     await Swal.fire({
         title: 'SHELL GAME',
         text: 'El objetivo del juego es que el jugador adivine en qué cubilete se encuentra la bolita',
         confirmButtonText: '¡Empezar!',
         confirmButtonColor: '#275cce',
-        allowOutsideClick: false
+        allowOutsideClick: false,
+        backdrop: ` rgba(0,0,0,0.3) url("/img/imagen.png") right 150px center no-repeat`
     });
 
     // Insertar el nombre
@@ -61,26 +62,8 @@ let maxBalance; // Maximo de saldo ingresado
         inputPlaceholder: 'Nombre'
     });
 
-    // Especificar una dificultad
-    levelDifficult = await Swal.fire({
-        title: 'Configuración',
-        text: 'Selecione el nivel de levelDifficult:',
-        input: 'select',
-        inputPlaceholder: 'Selecciona la dificultad',
-        inputOptions: {
-            0: 'Facil (Las apuestas x2)',
-            1: 'Medio (Las apuestas x5)',
-            2: 'Dificil (Las apuestas x10)'
-        },
-        inputValidator: (value) => {
-            if (!value) {
-                return 'Este campo no puede estar vacio!'
-            }
-        },
-        confirmButtonText: 'Siguiente',
-        confirmButtonColor: '#275cce',
-        allowOutsideClick: false
-    });
+    // Funcion para imprimir el nivel que queremos tener
+    await changeLevel();
 
     // Insertar el nombre
     maxBalance = await numSwal.fire({
@@ -98,24 +81,8 @@ let maxBalance; // Maximo de saldo ingresado
         title: 'Bienvenido ' + playerName.value
     });
 
-    // Imprimiremos los cubiletes segun la levelDifficult selecionada
-    switch (levelDifficult.value) {
-        case '0': // Facil
-            maxCup = Number(3);
-            break;
-        case '1': // Medio
-            maxCup = Number(5);
-            break;
-        case '2': // Dificil
-            maxCup = Number(7);
-            break;
-    }
-
-    // Bucle para imprimir los cubiletes en pantalla
-    for (let x = 1; x <= maxCup; x++) {
-        document.getElementById('board').innerHTML += `<div class="beaker" id="${x}">${x}</div>`;
-    }
-
+    //Imprimiremos para tener la opcion de cambiar de nivel
+    document.getElementById('changeLevel').innerHTML = '<div class="changeLevelButton"><a href = "#"  onclick="changeLevel()" class = "bx bx-menu" ></div>';
 })();
 
 let wageredBalance; // Saldo apostado
@@ -191,7 +158,7 @@ async function reboot() {
                 let reward;
                 let titleSwalReward; // Guardamos el titulo segun si has ganado o perdido
                 let alertReward; // Guaramos el mensjae de vuelta
-                if (cupChosen.value == cupWinner) {
+                if (parseInt(cupChosen.value) === cupWinner) {
                     switch (levelDifficult.value) {
                         case '0': // Facil
                             reward = parseInt(wageredBalance.value) * 2;
@@ -220,7 +187,8 @@ async function reboot() {
                     showCloseButton: true,
                     confirmButtonText: '¡Volver a jugar!',
                     confirmButtonColor: '#275cce',
-                    timer: 10000
+                    timer: 10000,
+                    footer: 'La bolita estaba en el cubilete número ' + cupWinner
                 }).then((result) => {
                     // Repatimos la apuesta
                     if (result.isConfirmed) {
@@ -252,7 +220,7 @@ async function reboot() {
         }).then((result) => {
             // Repatimos la apuesta
             if (result.isConfirmed) {
-                (async() => {
+                (async () => {
                     // Insertar el nombre
                     maxBalance = await numSwal.fire({
                         title: 'Configuración',
@@ -262,9 +230,54 @@ async function reboot() {
                             min: 1
                         }
                     });
-                    reboot();
+                    await reboot();
                 })();
             }
         });
+    }
+}
+
+// Creamos una funcion para cambiar de nivel dentro del juego
+async function changeLevel() {
+    // Especificar una dificultad
+    levelDifficult = await Swal.fire({
+        title: 'Configuración',
+        text: 'Selecione el nivel de dificultad:',
+        input: 'select',
+        inputPlaceholder: 'Selecciona la dificultad',
+        inputOptions: {
+            0: 'Facil (Las apuestas x2)',
+            1: 'Medio (Las apuestas x5)',
+            2: 'Dificil (Las apuestas x10)'
+        },
+        inputValidator: (value) => {
+            if (!value) {
+                return 'Este campo no puede estar vacio!'
+            }
+        },
+        confirmButtonText: 'Siguiente',
+        confirmButtonColor: '#275cce',
+        allowOutsideClick: false
+    });
+
+    // Imprimiremos los cubiletes segun la levelDifficult selecionada
+    switch (levelDifficult.value) {
+        case '0': // Facil
+            maxCup = Number(3);
+            break;
+        case '1': // Medio
+            maxCup = Number(5);
+            break;
+        case '2': // Dificil
+            maxCup = Number(7);
+            break;
+    }
+
+    // Substituimos los cubiletes anteriores por null
+    document.getElementById('board').innerHTML = ` `;
+    // Bucle para imprimir los cubiletes en pantalla
+    for (let x = 1; x <= maxCup; x++) {
+
+        document.getElementById('board').innerHTML += `<div class="beaker" id="${x}">${x}</div>`;
     }
 }

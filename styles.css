@@ -2,7 +2,7 @@ body {
     background-color: #09203f;
 }
 
- ::-webkit-scrollbar {
+::-webkit-scrollbar {
     display: none;
 }
 
@@ -22,7 +22,7 @@ button {
 }
 
 .beaker {
-    border-bottom: 30vh solid #275cce;
+    border-bottom: 30vh solid #ce2775;
     border-left: 10vh solid transparent;
     border-right: 10vh solid transparent;
     border-radius: 25vh 25vh 2vh 2vh;
@@ -32,14 +32,14 @@ button {
     line-height: 25vh;
     font-size: 15vh;
     text-align: center;
-    color: #6c91e0;
+    color: #e06c6c;
     font-family: Arial, Helvetica, sans-serif;
     margin: 1%;
-    filter: drop-shadow(0 1mm 30mm #537895);
+    filter: drop-shadow(0 1mm 30mm #b34c3a);
 }
 
 .currentBalanceContent {
-    background-color: #275cce60;
+    background-color: #ce322760;
     color: white;
     position: fixed;
     right: 25px;
@@ -58,7 +58,7 @@ button {
 #buttonReboot {
     border: none;
     color: white;
-    background-color: #275cce;
+    background-color: #ce3227;
     padding: 15px 32px;
     text-align: center;
     text-decoration: none;
@@ -71,7 +71,7 @@ button {
 }
 
 #buttonReboot:hover {
-    background-color: #275cce60;
+    background-color: #ce402760;
     transition: 0.4s;
 }
 
@@ -92,7 +92,7 @@ button {
 
 .changeLevelButton>.bx {
     color: rgb(255, 255, 255, 255);
-    background-color: #275cce60;
+    background-color: #6727ce60;
     border-radius: 50%;
     font-size: 40px;
     text-decoration: none;
@@ -101,7 +101,7 @@ button {
 }
 
 .changeLevelButton .bx:hover {
-    background-color: #275cce;
+    background-color: #ce4e27;
 }
 
 #mobil-vertical {
@@ -120,6 +120,7 @@ button {
     .board {
         display: none;
     }
+
     #mobil-vertical {
         display: block;
     }
